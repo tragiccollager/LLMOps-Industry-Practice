@@ -87,9 +87,9 @@ MODELS = {
 
 # 测试配置
 CONFIG = {
-    "max_retries": 3,
+    "max_retries": 2,              # 减少重试次数，避免长时间等待
     "retry_delay": 2,
-    "request_timeout": 300,      # 增加到5分钟
+    "request_timeout": 600,        # 增加到10分钟，给大模型足够时间
     "temperature": 0.7,
     "connection_timeout": 10,
     "backoff_factor": 1,
