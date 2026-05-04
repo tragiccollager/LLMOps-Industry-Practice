@@ -42,9 +42,11 @@ class MCPClient:
             env=None
         )
         
-        stdio_transport = await stdio_client(server_params)
+        # 使用 async with 上下文管理器
+        self._client_ctx = stdio_client(server_params)
+        stdio_transport = await self._client_ctx.__aenter__()
         self.stdio, self.write = stdio_transport
-        self.session = await ClientSession(self.stdio, self.write)
+        self.session = await ClientSession(self.stdio, self.write).__aenter__()
         await self.session.initialize()
         
         # 动态发现工具
@@ -205,8 +207,13 @@ class MCPClient:
     
     async def close(self):
         """关闭连接"""
-        if self.session:
-            await self.session.close()
+        try:
+            if hasattr(self, 'session') and self.session:
+                await self.session.__aexit__(None, None, None)
+            if hasattr(self, '_client_ctx') and self._client_ctx:
+                await self._client_ctx.__aexit__(None, None, None)
+        except Exception as e:
+            print(f"[{self.model_name}] 关闭连接时出错: {e}")
 
 
 async def compare_models(query: str):
