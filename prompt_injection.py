@@ -89,7 +89,7 @@ MODELS = {
 CONFIG = {
     "max_retries": 3,
     "retry_delay": 2,
-    "request_timeout": 120,
+    "request_timeout": 300,      # 增加到5分钟
     "temperature": 0.7,
     "connection_timeout": 10,
     "backoff_factor": 1,
