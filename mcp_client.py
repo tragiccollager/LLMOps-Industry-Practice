@@ -83,9 +83,9 @@ class MCPClient:
     def decide_tool_calls(self, user_query: str) -> List[Dict]:
         """使用大模型决定调用哪些工具"""
         
-        # 构建工具描述
+        # 构建工具描述（简化版）
         tools_desc = "\n".join([
-            f"{i+1}. {tool.name}: {tool.description}\n   参数: {tool.inputSchema}"
+            f"{i+1}. {tool.name}: {tool.description[:80]}..."
             for i, tool in enumerate(self.tools)
         ])
         
@@ -94,25 +94,28 @@ class MCPClient:
 可用工具列表:
 {tools_desc}
 
-你的任务是:
-1. 分析用户查询的意图
-2. 决定需要调用哪些工具（可以多个）
-3. 确定每个工具的调用顺序
-4. 为每个工具准备正确的参数
+工具参数说明:
+- get_employee_directory: department (可选，字符串，如"技术部"，不传则返回所有员工)
+- calculate_payroll: employee_json (必需，JSON字符串), tax_rate (可选，默认0.1), insurance_rate (可选，默认0.08)
+- export_to_csv: data_json (必需，JSON字符串), filename (可选，默认"export.csv")
+- analyze_department_summary: employee_json (必需，JSON字符串)
+
+重要规则:
+1. 如果查询涉及"所有员工"或"各部门"，get_employee_directory 的 department 参数设为 null 或不传
+2. 工具之间有依赖关系时，使用 "output_of_step_X" 作为参数值引用上一步结果
+3. 只返回JSON，不要包含其他文字
 
 请以JSON格式返回工具调用计划:
 {{
-    "reasoning": "分析过程",
     "tool_calls": [
         {{
             "tool_name": "工具名称",
-            "parameters": {{参数对象}},
-            "depends_on": "依赖的上一步结果变量名（可选）"
+            "parameters": {{"参数名": "参数值"}}
         }}
     ]
 }}"""
         
-        prompt = f"用户查询: {user_query}\n\n请决定工具调用计划:"
+        prompt = f"用户查询: {user_query}\n\n请决定工具调用计划，只返回JSON:"
         
         response = self.call_ollama(prompt, system_prompt)
         
@@ -126,11 +129,30 @@ class MCPClient:
             else:
                 json_str = response
             
-            plan = json.loads(json_str.strip())
-            return plan.get("tool_calls", [])
+            # 清理可能的额外字符
+            json_str = json_str.strip()
+            if json_str.startswith('"') and json_str.endswith('"'):
+                json_str = json_str[1:-1]
+            
+            plan = json.loads(json_str)
+            calls = plan.get("tool_calls", [])
+            
+            # 处理参数中的特殊值
+            for i, call in enumerate(calls):
+                params = call.get("parameters", {})
+                for key, value in params.items():
+                    if value == "null" or value == "":
+                        params[key] = None
+                    elif isinstance(value, str) and value.startswith("output_of_step_"):
+                        # 标记需要替换
+                        call["_needs_replacement"] = True
+                        call["_replacement_key"] = key
+                        call["_replacement_step"] = int(value.split("_")[-1])
+            
+            return calls
         except Exception as e:
             print(f"[{self.model_name}] 解析工具调用计划失败: {e}")
-            print(f"  模型响应: {response[:200]}...")
+            print(f"  模型响应: {response[:300]}...")
             return []
     
     async def execute_tool(self, tool_name: str, parameters: Dict) -> str:
@@ -168,20 +190,31 @@ class MCPClient:
         
         for i, call in enumerate(tool_calls):
             tool_name = call["tool_name"]
-            parameters = call.get("parameters", {})
+            parameters = call.get("parameters", {}).copy()
             
-            # 处理依赖关系
-            if "depends_on" in call and call["depends_on"] in results:
-                dep_result = results[call["depends_on"]]
-                # 将依赖结果注入参数
-                for key, value in parameters.items():
-                    if value == "{{previous_result}}":
-                        parameters[key] = dep_result
+            # 处理依赖关系 - 替换上一步的结果
+            if call.get("_needs_replacement"):
+                step_idx = call.get("_replacement_step", 0)
+                if step_idx < i:
+                    prev_result = results.get(f"step_{step_idx}", "")
+                    key = call.get("_replacement_key")
+                    if key and prev_result:
+                        parameters[key] = prev_result
             
-            print(f"\n  调用 {tool_name}...")
+            # 处理其他可能的引用
+            for key, value in list(parameters.items()):
+                if isinstance(value, str):
+                    if value.startswith("output_of_step_"):
+                        step_idx = int(value.split("_")[-1])
+                        if step_idx < i:
+                            parameters[key] = results.get(f"step_{step_idx}", "")
+                    elif value == "null" or value == "":
+                        parameters[key] = None
+            
+            print(f"\n  调用 {tool_name}，参数: {parameters}")
             result = await self.execute_tool(tool_name, parameters)
             results[f"step_{i}"] = result
-            print(f"  结果: {result[:100]}...")
+            print(f"  结果: {result[:150]}...")
         
         # 步骤3: 使用模型生成最终回答
         print("\n[步骤3] 生成最终回答...")
