@@ -1,0 +1,7 @@
+timestamp,model_name,question,reference_answer,model_answer,relevance_score,accuracy_score,completeness_score,fluency_score,total_score,judge_model,evaluation_feedback,status
+2026-05-05 18:04:17,qwen3.5:9b,什么是机器学习？,机器学习是人工智能的一个分支，通过算法让计算机从数据中学习规律。,机 (1),1.0,1.0,1.0,2.0,1.25,qwen3.5:9b,从文本提取,SUCCESS
+2026-05-05 18:05:09,qwen3.5:9b,Python的装饰器是什么？,装饰器是用@语法修饰函数的设计模式，可在不修改原函数的情况下添加功能。,Python 装饰器是一种设计模式，用于在不,9.0,8.5,2.0,0,6.5,qwen3.5:9b,从文本提取,SUCCESS
+2026-05-05 18:06:02,qwen3.5:9b,如何优化数据库查询？,添加索引、优化SQL语句、使用缓存、分表分库等方法。,5. **逻辑优化**：避免 N+1 问题，批量操作代替循环。,0,0,0,0,0,qwen3.5:9b,解析失败: Expecting value: line 1 column 1 (char 0),FAILED
+2026-05-05 18:09:36,qwen3.5:35b-a3b,什么是机器学习？,机器学习是人工智能的一个分支，通过算法让计算机从数据中学习规律。,4.  **Final Polish (checking constraints):**,1.0,1.0,1.0,5.0,2.0,qwen3.5:9b,从文本提取,SUCCESS
+2026-05-05 18:13:07,qwen3.5:35b-a3b,Python的装饰器是什么？,装饰器是用@语法修饰函数的设计模式，可在不修改原函数的情况下添加功能。,5.  **Final Polish:**,1.0,1.0,1.0,5.0,2.0,qwen3.5:9b,从文本提取,SUCCESS
+2026-05-05 18:16:24,qwen3.5:35b-a3b,如何优化数据库查询？,添加索引、优化SQL语句、使用缓存、分表分库等方法。,定期监控慢查询日志，持续迭代优化。,0,0,0,0,0,qwen3.5:9b,解析失败: Expecting value: line 1 column 1 (char 0),FAILED

@@ -1,0 +1,258 @@
+{
+  "metadata": {
+    "timestamp": "20260505_000623",
+    "config": {
+      "target_model": "qwen3.5:9b",
+      "judge_model": "qwen3.5:9b",
+      "total_cases": 5,
+      "safety_guard_enabled": true
+    }
+  },
+  "summary": {
+    "average_score": 5.0,
+    "max_score": 5.0,
+    "min_score": 5.0,
+    "std_deviation": 0.0,
+    "category_avg": {
+      "技术概念": 5.0,
+      "编程": 5.0,
+      "数据库": 5.0,
+      "Web开发": 5.0,
+      "运维": 5.0
+    },
+    "dimension_avg": {
+      "准确性": 5.0,
+      "完整性": 5.0,
+      "简洁性": 5.0,
+      "相关性": 5.0
+    },
+    "safety_statistics": {
+      "SAFE": 5,
+      "WARNING": 0,
+      "DANGEROUS": 0,
+      "BLOCKED": 0
+    }
+  },
+  "detailed_results": [
+    {
+      "question_id": 1,
+      "question": "什么是机器学习？用一句话解释。",
+      "category": "技术概念",
+      "difficulty": "easy",
+      "reference_answer": "机器学习是让计算机从数据中学习规律而无需显式编程的技术。",
+      "model_answer": "[错误] 调用模型 qwen3.5:9b 失败，已重试2次",
+      "total_score": 5.0,
+      "weighted_score": 5.0,
+      "scores": [
+        {
+          "dimension": "准确性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败: Expecting value: line 1 column"
+        },
+        {
+          "dimension": "完整性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "简洁性",
+          "score": 5.0,
+          "weight": 0.8,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "相关性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        }
+      ],
+      "safety_check": {
+        "is_safe": true,
+        "level": "安全",
+        "violations": [],
+        "sanitized_input": "什么是机器学习？用一句话解释。"
+      },
+      "feedback": "解析失败，无法提供改进建议",
+      "evaluation_time": "0:02:07.424777"
+    },
+    {
+      "question_id": 2,
+      "question": "Python装饰器是什么？简要说明。",
+      "category": "编程",
+      "difficulty": "medium",
+      "reference_answer": "装饰器是用@语法修饰函数的设计模式，可在不修改原函数的情况下添加功能。",
+      "model_answer": "[错误] 调用模型 qwen3.5:9b 失败，已重试2次",
+      "total_score": 5.0,
+      "weighted_score": 5.0,
+      "scores": [
+        {
+          "dimension": "准确性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败: Expecting value: line 1 column"
+        },
+        {
+          "dimension": "完整性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "简洁性",
+          "score": 5.0,
+          "weight": 0.8,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "相关性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        }
+      ],
+      "safety_check": {
+        "is_safe": true,
+        "level": "安全",
+        "violations": [],
+        "sanitized_input": "Python装饰器是什么？简要说明。"
+      },
+      "feedback": "解析失败，无法提供改进建议",
+      "evaluation_time": "0:01:58.680614"
+    },
+    {
+      "question_id": 3,
+      "question": "数据库查询优化的两个关键方法？",
+      "category": "数据库",
+      "difficulty": "medium",
+      "reference_answer": "添加索引和优化SQL语句。",
+      "model_answer": "[错误] 调用模型 qwen3.5:9b 失败，已重试2次",
+      "total_score": 5.0,
+      "weighted_score": 5.0,
+      "scores": [
+        {
+          "dimension": "准确性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败: Expecting value: line 1 column"
+        },
+        {
+          "dimension": "完整性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "简洁性",
+          "score": 5.0,
+          "weight": 0.8,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "相关性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        }
+      ],
+      "safety_check": {
+        "is_safe": true,
+        "level": "安全",
+        "violations": [],
+        "sanitized_input": "数据库查询优化的两个关键方法？"
+      },
+      "feedback": "解析失败，无法提供改进建议",
+      "evaluation_time": "0:01:58.300534"
+    },
+    {
+      "question_id": 4,
+      "question": "什么是RESTful API？一句话概括。",
+      "category": "Web开发",
+      "difficulty": "easy",
+      "reference_answer": "RESTful API是基于HTTP方法操作资源的接口设计规范。",
+      "model_answer": "[错误] 调用模型 qwen3.5:9b 失败，已重试2次",
+      "total_score": 5.0,
+      "weighted_score": 5.0,
+      "scores": [
+        {
+          "dimension": "准确性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败: Expecting value: line 1 column"
+        },
+        {
+          "dimension": "完整性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "简洁性",
+          "score": 5.0,
+          "weight": 0.8,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "相关性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        }
+      ],
+      "safety_check": {
+        "is_safe": true,
+        "level": "安全",
+        "violations": [],
+        "sanitized_input": "什么是RESTful API？一句话概括。"
+      },
+      "feedback": "解析失败，无法提供改进建议",
+      "evaluation_time": "0:01:58.359763"
+    },
+    {
+      "question_id": 5,
+      "question": "Docker容器相比虚拟机的主要优势？",
+      "category": "运维",
+      "difficulty": "medium",
+      "reference_answer": "更轻量、启动更快，共享主机内核。",
+      "model_answer": "[错误] 调用模型 qwen3.5:9b 失败，已重试2次",
+      "total_score": 5.0,
+      "weighted_score": 5.0,
+      "scores": [
+        {
+          "dimension": "准确性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败: Expecting value: line 1 column"
+        },
+        {
+          "dimension": "完整性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "简洁性",
+          "score": 5.0,
+          "weight": 0.8,
+          "explanation": "解析失败，默认评分"
+        },
+        {
+          "dimension": "相关性",
+          "score": 5.0,
+          "weight": 1.0,
+          "explanation": "解析失败，默认评分"
+        }
+      ],
+      "safety_check": {
+        "is_safe": true,
+        "level": "安全",
+        "violations": [],
+        "sanitized_input": "Docker容器相比虚拟机的主要优势？"
+      },
+      "feedback": "解析失败，无法提供改进建议",
+      "evaluation_time": "0:01:58.338188"
+    }
+  ]
+}

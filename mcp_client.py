@@ -7,9 +7,30 @@ MCP Client 实现
 import json
 import asyncio
 import requests
+import subprocess
 from typing import List, Dict, Any, Optional
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+
+def stop_other_models(current_model: str):
+    """停止其他正在运行的模型以释放显存"""
+    for model_name in MODELS.keys():
+        if model_name != current_model:
+            try:
+                # 使用 utf-8 编码避免 Windows 中文错误
+                result = subprocess.run(
+                    ["ollama", "stop", model_name],
+                    capture_output=True,
+                    encoding='utf-8',
+                    errors='ignore',
+                    timeout=10
+                )
+                if result.returncode == 0:
+                    print(f"  ✓ 已停止模型: {model_name}")
+            except Exception:
+                # 忽略错误（如模型未运行或ollama命令失败）
+                pass
 
 
 # 模型配置
@@ -72,7 +93,7 @@ class MCPClient:
             response = requests.post(
                 self.model_config["api_url"],
                 json=payload,
-                timeout=120
+                timeout=300  # 增加到5分钟，防止生成最终回答时超时
             )
             response.raise_for_status()
             result = response.json()
@@ -138,7 +159,7 @@ class MCPClient:
             calls = plan.get("tool_calls", [])
             
             # 处理参数中的特殊值
-            for i, call in enumerate(calls):
+            for call in calls:
                 params = call.get("parameters", {})
                 for key, value in params.items():
                     if value == "null" or value == "":
@@ -195,7 +216,7 @@ class MCPClient:
             # 处理依赖关系 - 替换上一步的结果
             if call.get("_needs_replacement"):
                 step_idx = call.get("_replacement_step", 0)
-                if step_idx < i:
+                if step_idx <= i:
                     prev_result = results.get(f"step_{step_idx}", "")
                     key = call.get("_replacement_key")
                     if key and prev_result:
@@ -206,14 +227,25 @@ class MCPClient:
                 if isinstance(value, str):
                     if value.startswith("output_of_step_"):
                         step_idx = int(value.split("_")[-1])
-                        if step_idx < i:
+                        if step_idx <= i:
                             parameters[key] = results.get(f"step_{step_idx}", "")
                     elif value == "null" or value == "":
                         parameters[key] = None
             
+            # Fallback: 如果参数为空且看起来像需要JSON，使用前一步结果
+            if i > 0:
+                json_params = ['employee_json', 'data_json', 'employees', 'data']
+                for key in json_params:
+                    if key in parameters and (parameters[key] is None or parameters[key] == ""):
+                        prev_step_result = results.get(f"step_{i}", "")
+                        if prev_step_result:
+                            parameters[key] = prev_step_result
+                            print(f"    [自动修复] 使用前一步结果填充 {key}")
+                            break
+            
             print(f"\n  调用 {tool_name}，参数: {parameters}")
             result = await self.execute_tool(tool_name, parameters)
-            results[f"step_{i}"] = result
+            results[f"step_{i+1}"] = result  # 使用1-based索引，与LLM的output_of_step_X对应
             print(f"  结果: {result[:150]}...")
         
         # 步骤3: 使用模型生成最终回答
@@ -249,7 +281,7 @@ class MCPClient:
             print(f"[{self.model_name}] 关闭连接时出错: {e}")
 
 
-async def compare_models(query: str):
+async def compare_models(query: str, models: list = None):
     """对比两个模型的工具调用能力"""
     print("\n" + "="*70)
     print("MCP Client 双模型对比测试")
@@ -257,8 +289,12 @@ async def compare_models(query: str):
     print(f"\n测试查询: {query}")
     
     results = {}
+    test_models = models if models else list(MODELS.keys())
     
-    for model_name in MODELS.keys():
+    for model_name in test_models:
+        # 停止其他模型以释放显存
+        stop_other_models(model_name)
+        
         client = MCPClient(model_name)
         try:
             await client.connect_to_server()
@@ -269,6 +305,8 @@ async def compare_models(query: str):
             results[model_name] = {"success": False, "error": str(e)}
         finally:
             await client.close()
+            # 测试完当前模型后也停止它，为下一个模型释放显存
+            stop_other_models(None)  # None会停止所有模型
     
     # 输出对比结果
     print("\n" + "="*70)
@@ -300,9 +338,18 @@ async def main():
     
     print("MCP Client - 使用 Ollama 模型进行工具调用")
     print("支持的模型:", list(MODELS.keys()))
+    print("\n提示: 如果 35b 模型报 500 错误，可能是显存不足或模型未加载")
+    print("      可以先只测试 9b 模型")
+    
+    # 选择测试模式：只测试9b，或双模型对比
+    # 单模型测试（推荐）
+    models_to_test = ["qwen3.5:9b"]
+    
+    # 双模型测试（取消下行注释）
+    # models_to_test = list(MODELS.keys())
     
     for query in test_queries:
-        await compare_models(query)
+        await compare_models(query, models=models_to_test)
         print("\n" + "-"*70)
 
 
